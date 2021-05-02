@@ -8,7 +8,8 @@ export default {
     },
   },
   actions: {
-    seyHello({ commit }) {
+    async seyHello({ commit }) {
+      console.log("auth");
       commit("setHello");
     },
   },
