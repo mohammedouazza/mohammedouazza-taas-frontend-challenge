@@ -45,6 +45,7 @@ export default {
           value: branche.id,
           text: branche.name,
           repo: state.selectedRepo.value,
+          lastCommitId: branche.commit.sha,
         };
       });
       state.branches = [
@@ -60,6 +61,7 @@ export default {
           author: commitItem.commit.author.name,
           date: commitItem.commit.author.date,
           url: commitItem.commit.url,
+          parents: commitItem.parents.map((parent) => parent.sha),
         };
       });
       state.commits = newCommits;
@@ -104,7 +106,6 @@ export default {
           `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/commits`
         )
         .then((res) => {
-          console.log(res);
           commit("storeCommits", res.data);
         });
     },

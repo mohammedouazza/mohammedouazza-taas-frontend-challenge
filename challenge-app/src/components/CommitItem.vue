@@ -1,10 +1,12 @@
 <template>
   <div>
-    <b-card :title="commit.message" :sub-title="commit.date">
-      <b-card-text> sha: {{ commit.id }} </b-card-text>
+    <b-list-group-item>
+      <b-card :title="commit.message" :sub-title="commit.date">
+        <b-card-text>SHA: {{ commit.id }} </b-card-text>
 
-      <b-card-text>author: {{ commit.author }}</b-card-text>
-    </b-card>
+        <b-card-text>Author: {{ commit.author }}</b-card-text>
+      </b-card>
+    </b-list-group-item>
   </div>
 </template>
 
@@ -12,6 +14,11 @@
 export default {
   props: {
     commit: {},
+  },
+  computed: {
+    selectedBranche() {
+      return this.$store.getters.getSelectedBranche;
+    },
   },
 };
 </script>

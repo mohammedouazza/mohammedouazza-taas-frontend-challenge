@@ -13,16 +13,6 @@
             <b-nav-item
               ><router-link class="link-router" to="/">Home</router-link>
             </b-nav-item>
-            <b-nav-item
-              ><router-link class="link-router" to="/repos"
-                >Repositories</router-link
-              >
-            </b-nav-item>
-            <b-nav-item
-              ><router-link class="link-router" to="/branches"
-                >Branches</router-link
-              >
-            </b-nav-item>
           </b-navbar-nav>
         </b-container>
       </b-collapse>
