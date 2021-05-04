@@ -40,9 +40,15 @@ export default {
   },
   methods: {
     changeRepo(repo) {
+      console.log(repo, this.selectedRepo);
       this.$store.dispatch("setRepoAction", repo);
     },
     changeBranche(branche) {
+      console.log(
+        branche,
+        this.selectedBranche,
+        this.$store.getters.getBranches
+      );
       this.$store.dispatch("setBrancheAction", branche);
     },
   },

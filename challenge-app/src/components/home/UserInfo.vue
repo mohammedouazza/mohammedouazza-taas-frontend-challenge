@@ -38,6 +38,9 @@ export default {
     selectedRepo() {
       return this.$store.getters.getSelectedRepo;
     },
+    selectedBranche() {
+      return this.$store.getters.getSelectedBranche;
+    },
     commits() {
       let commits = [];
       const allCommits = this.$store.getters.getCommits;
@@ -65,6 +68,10 @@ export default {
   },
   watch: {
     selectedRepo() {
+      this.loading = false;
+      this.counter = 0;
+    },
+    selectedBranche() {
       this.loading = false;
       this.counter = 0;
     },
