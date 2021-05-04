@@ -23,7 +23,6 @@ export default {
     return {
       selectedRepo: null,
       selectedBranche: null,
-      message: "Hello from home",
     };
   },
   computed: {
@@ -37,9 +36,6 @@ export default {
           (b) => b.repo === this.selectedRepo
         ),
       ];
-    },
-    getMessage() {
-      return this.$store.getters.getHello || this.message;
     },
   },
   methods: {
