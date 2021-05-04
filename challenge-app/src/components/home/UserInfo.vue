@@ -5,9 +5,9 @@
       <img :src="userInfo.avatar_url" alt="userAvatar" width="60" height="50" />
     </div>
     <h1 class="text-left">{{ selectedRepo && selectedRepo.text }}</h1>
-    <div class="text-left" v-if="selectedRepo">
+    <div class="text-left">
       <h4>Commits</h4>
-      <b-list-group v-if="commits.length" id="infinit-scroll">
+      <b-list-group id="infinit-scroll">
         <commit-item
           v-for="commit in commits"
           :key="commit.id"
