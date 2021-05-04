@@ -1,6 +1,19 @@
 <template>
   <div>
-    {{ getMessage }}
+    <p class="mb-2">Repositories</p>
+    <b-form-select
+      class="mb-4"
+      v-model="selectedRepo"
+      @change="changeRepo"
+      :options="repositories"
+    ></b-form-select>
+
+    <p class="mb-2">Branches</p>
+    <b-form-select
+      v-model="selectedBranche"
+      @change="changeBranche"
+      :options="branches"
+    ></b-form-select>
   </div>
 </template>
 
@@ -8,13 +21,33 @@
 export default {
   data() {
     return {
+      selectedRepo: null,
+      selectedBranche: null,
       message: "Hello from home",
     };
   },
   computed: {
+    repositories() {
+      return this.$store.getters.getRepos;
+    },
+    branches() {
+      return [
+        { value: null, text: "Please select a branche" },
+        ...this.$store.getters.getBranches.filter(
+          (b) => b.repo === this.selectedRepo
+        ),
+      ];
+    },
     getMessage() {
-      console.log(this.$store);
       return this.$store.getters.getHello || this.message;
+    },
+  },
+  methods: {
+    changeRepo(repo) {
+      this.$store.dispatch("setRepoAction", repo);
+    },
+    changeBranche(branche) {
+      this.$store.dispatch("setBrancheAction", branche);
     },
   },
 };

@@ -25,7 +25,7 @@ export default {
 <style>
 .columns {
   border: 2px solid grey;
-  border-radius: 20px;
+  border-radius: 10px;
   height: 90vh;
 }
 </style>
