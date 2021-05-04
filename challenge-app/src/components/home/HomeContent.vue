@@ -1,5 +1,8 @@
 <template>
   <div>
+    <b-alert v-if="error" show dismissible variant="danger"
+      >{{ username }} not found !</b-alert
+    >
     <b-alert v-if="isAuth" show dismissible variant="success"
       >You are authenticated successfully</b-alert
     >
@@ -9,6 +12,7 @@
         required
         v-model="username"
         class="mb-2"
+        @keypress-enter="authenticateGithub"
       ></b-input>
       <b-button @click="authenticateGithub">Authenticate to Github</b-button>
     </b-container>
@@ -23,6 +27,7 @@ export default {
   data() {
     return {
       username: "",
+      error: false,
     };
   },
   components: {
@@ -32,16 +37,13 @@ export default {
     isAuth() {
       return this.$store.getters.getIsAuth;
     },
-    selectedRepo() {
-      return this.$store.getters.getSelectedRepo;
-    },
-    selectedBranche() {
-      return this.$store.getters.getSelectedBranche;
-    },
   },
   methods: {
     authenticateGithub() {
-      this.$store.dispatch("authenticate", this.username);
+      this.$store.dispatch("authenticate", this.username).then(() => {
+        this.error = false;
+        if (!this.isAuth) this.error = true;
+      });
     },
   },
 };

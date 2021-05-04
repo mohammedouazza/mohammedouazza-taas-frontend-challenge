@@ -4,38 +4,21 @@ const GITHUB_URL = "https://api.github.com";
 
 export default {
   state: {
-    hello: "",
     username: "",
     user: {},
     isAuth: false,
     selectedRepo: null,
     selectedBranche: null,
-    repos: [
-      { value: null, text: "Please select a repository" },
-      { value: "a", text: "Repo A" },
-      { value: "b", text: "Repo B" },
-      { value: "c", text: "Repo C" },
-      { value: "d", text: "Repo D" },
-    ],
-    branches: [
-      { value: null, text: "Please select a branche" },
-      { value: "a", text: "Branche A1", repo: "a" },
-      { value: "b", text: "Branche A2", repo: "a" },
-      { value: "c", text: "Branche A3", repo: "a" },
-      { value: "d", text: "Branche B1", repo: "b" },
-      { value: "e", text: "Branche B2", repo: "b" },
-      { value: "f", text: "Branche B3", repo: "b" },
-    ],
+    repos: [{ value: null, text: "Please select a repository" }],
+    branches: [{ value: null, text: "Please select a branche" }],
+    commits: [],
   },
   mutations: {
-    setHello(state) {
-      state.hello = "Hello challange";
-    },
     setRepo(state, repo) {
-      state.selectedRepo = repo;
+      state.selectedRepo = state.repos.find((r) => r.value === repo);
     },
     setBranche(state, branche) {
-      state.selectedBranche = branche;
+      state.selectedBranche = state.branches.find((b) => b.value === branche);
     },
     setUsername(state, username) {
       state.username = username;
@@ -45,17 +28,55 @@ export default {
       state.user = user;
     },
     storeRepos(state, repos) {
-      state.repos = repos;
+      const newRepos = repos.map((repo) => {
+        return {
+          value: repo.id,
+          text: repo.name,
+        };
+      });
+      state.repos = [
+        { value: null, text: "Please select a repository" },
+        ...newRepos,
+      ];
+    },
+    storeBranches(state, branches) {
+      const newBranches = branches.map((branche) => {
+        return {
+          value: branche.id,
+          text: branche.name,
+          repo: state.selectedRepo.value,
+          lastCommitId: branche.commit.sha,
+        };
+      });
+      state.branches = [
+        { value: null, text: "Please select a branche" },
+        ...newBranches,
+      ];
+    },
+    storeCommits(state, commits) {
+      const newCommits = commits.map((commitItem) => {
+        return {
+          id: commitItem.sha,
+          message: commitItem.commit.message,
+          author: commitItem.commit.author.name,
+          date: commitItem.commit.author.date,
+          url: commitItem.commit.url,
+          parents: commitItem.parents.map((parent) => parent.sha),
+        };
+      });
+      state.commits = newCommits;
     },
   },
   actions: {
-    authenticate({ commit, dispatch }, username) {
+    async authenticate({ commit, dispatch }, username) {
       commit("setUsername", username);
       dispatch("loadUser");
       dispatch("loadRepos");
     },
-    setRepoAction({ commit }, repo) {
+    setRepoAction({ commit, dispatch }, repo) {
       commit("setRepo", repo);
+      dispatch("loadBranches");
+      dispatch("loadCommits");
     },
     setBrancheAction({ commit }, branche) {
       commit("setBranche", branche);
@@ -70,16 +91,34 @@ export default {
         commit("storeRepos", res.data);
       });
     },
+    loadBranches({ state, commit }) {
+      axios
+        .get(
+          `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/branches`
+        )
+        .then((res) => {
+          commit("storeBranches", res.data);
+        });
+    },
+    loadCommits({ state, commit }) {
+      axios
+        .get(
+          `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/commits`
+        )
+        .then((res) => {
+          commit("storeCommits", res.data);
+        });
+    },
   },
   getters: {
-    getHello(state) {
-      return state.hello;
-    },
     getRepos(state) {
       return state.repos;
     },
     getBranches(state) {
       return state.branches;
+    },
+    getCommits(state) {
+      return state.commits;
     },
     getSelectedRepo(state) {
       return state.selectedRepo;
