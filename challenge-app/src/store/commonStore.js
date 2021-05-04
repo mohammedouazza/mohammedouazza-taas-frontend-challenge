@@ -42,7 +42,7 @@ export default {
     storeBranches(state, branches) {
       const newBranches = branches.map((branche) => {
         return {
-          value: branche.id,
+          value: branche.name,
           text: branche.name,
           repo: state.selectedRepo.value,
           lastCommitId: branche.commit.sha,
@@ -70,7 +70,7 @@ export default {
   actions: {
     async authenticate({ commit, dispatch }, username) {
       commit("setUsername", username);
-      dispatch("loadUser");
+      await dispatch("loadUser");
       dispatch("loadRepos");
     },
     setRepoAction({ commit, dispatch }, repo) {
@@ -78,13 +78,13 @@ export default {
       dispatch("loadBranches");
       dispatch("loadCommits");
     },
-    setBrancheAction({ commit }, branche) {
+    setBrancheAction({ commit, dispatch }, branche) {
       commit("setBranche", branche);
+      dispatch("loadCommits", branche);
     },
-    loadUser({ state, commit }) {
-      axios.get(`${GITHUB_URL}/users/${state.username}`).then((res) => {
-        commit("storeUser", res.data);
-      });
+    async loadUser({ state, commit }) {
+      const res = await axios.get(`${GITHUB_URL}/users/${state.username}`);
+      commit("storeUser", res.data);
     },
     loadRepos({ state, commit }) {
       axios.get(`${GITHUB_URL}/users/${state.username}/repos`).then((res) => {
@@ -100,14 +100,25 @@ export default {
           commit("storeBranches", res.data);
         });
     },
-    loadCommits({ state, commit }) {
-      axios
-        .get(
-          `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/commits`
-        )
-        .then((res) => {
-          commit("storeCommits", res.data);
-        });
+    loadCommits({ state, commit }, branche = null) {
+      const brancheSelected = state.branches.find((b) => b.value === branche);
+      if (brancheSelected.value) {
+        axios
+          .get(
+            `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/commits?sha=${brancheSelected.text}`
+          )
+          .then((res) => {
+            commit("storeCommits", res.data);
+          });
+      } else {
+        axios
+          .get(
+            `${GITHUB_URL}/repos/${state.username}/${state.selectedRepo.text}/commits`
+          )
+          .then((res) => {
+            commit("storeCommits", res.data);
+          });
+      }
     },
   },
   getters: {
